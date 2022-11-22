@@ -22,7 +22,7 @@ CREATE OR REPLACE VIEW view_tag_normalization AS
 This creates a table with duplicate tags but keeping the original ids:
 
 ```sql
-datandard=> select * FROM view_tag_normalization where id in (760297, 760298, 760299, 157805, 257028);
+datandard=> SELECT * FROM view_tag_normalization LIMIT 5;
    id   |      term      
 --------+----------------
  157805 | GDPR
@@ -34,3 +34,22 @@ datandard=> select * FROM view_tag_normalization where id in (760297, 760298, 76
 ```
 
 In this case, the one `GDPR` tag used to be `gdpr`. 
+
+## Fixing garbage in published / released timestamps
+From time to time, the published timestamp is not set in the source, or it will be parsed into something garbage. We keep a sourced timestamp from when it was first discovered in a **feed**. As the articles are removed from feeds in a fairly short manner, it is a good estimate that the original published time stamp can be too far from the discovered. Also, if we have multiple time stamps for the same article (but discovered multiple times), we take the first timestamp. The cases are:
+
+ - The published timestamp is max 10 days earlier than the created_by timestamp. Use this.
+ - The published timestamp is later than the created_by (should not be possible), or earlier than 10 days or not present. Used created_by.
+
+This does not fix the issue with the same article from multiple feeds. We use `MIN` on the valid timestamps as you can see earlier. 
+
+```sql
+SELECT 
+ CASE
+  WHEN NOW() < to_timestamp(published) THEN created_at
+  WHEN CAST(EXTRACT(EPOCH FROM (created_at - to_timestamp(published))) AS bigint) < 864000 THEN to_timestamp(published)
+  ELSE created_at
+ END AS published
+FROM news_article 
+;
+```
