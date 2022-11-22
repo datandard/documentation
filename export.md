@@ -53,3 +53,44 @@ SELECT
 FROM news_article 
 ;
 ```
+
+## Selecting the articles
+To make this look simpler, we create a view that is the cleaned up version of each article for each feed:
+
+```
+CREATE TYPE article_content AS (
+ context text,
+ contenttype varchar(500),
+ language varchar(500),
+ base text,
+ value text
+);
+CREATE OR REPLACE VIEW view_articles AS
+     SELECT 
+      a.id,
+      a.link,
+      a.medias,
+      CASE
+       WHEN NOW() < to_timestamp(a.published) THEN a.created_at
+       WHEN CAST(EXTRACT(EPOCH FROM (a.created_at - to_timestamp(a.published))) AS bigint) < 864000 THEN to_timestamp(a.published)
+       ELSE a.created_at
+      END AS published,
+     f.language,
+     ARRAY_AGG(distinct t.term) as tags,
+     ARRAY_AGG(distinct w.name) as authors,
+     ARRAY_AGG(distinct (
+       c.context,
+       c.contenttype,
+       c.language,
+       c.base,
+       c.value
+     )::article_content) as content
+     FROM news_article a
+      INNER JOIN news_feed f ON (a.feed_id = f.id)
+      LEFT JOIN news_article_tags at ON (at.article_id = a.id)
+      LEFT JOIN view_tag_normalization t ON (t.id = at.tag_id)
+      LEFT JOIN news_author w ON (w.article_id = a.id)
+      LEFT JOIN news_articlecontent c ON (c.article_id = a.id)
+     GROUP BY 
+      a.id, a.link, a.medias, f.language
+;
