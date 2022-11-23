@@ -94,3 +94,20 @@ CREATE OR REPLACE VIEW view_articles AS
      GROUP BY 
       a.id, a.link, a.medias, f.language
 ;
+
+Using this as a base will not perform due to the amount of joins. Therefore we can materialize it into a temp table through:
+
+```sql
+CREATE TABLE temp_articles (
+  id bigint,
+  link varchar(5000),
+  medias jsonb,
+  published timestamp with time zone,
+  language varchar(2000),
+  tags varchar(2000)[],
+  authors varchar(500)[],
+  content article_content[]
+);
+```
+
+and insert by `INSERT INTO temp_articles SELECT * FROM view_articles`. This will make our system run out of space. Need to fix that. 
