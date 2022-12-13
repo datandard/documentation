@@ -10,21 +10,7 @@ We store data in a very raw format, so a lot of processing is needed to export n
 This is done in a several of view, ending in a single view. Because This view is expensive to build, we will materialize at some point. All views are prefixed with `view_`.
 
 ### Tag normalizations
-Is done in the view `view_tag_normalization`. See (tags.md)[Tag Normalization Documentation] for more information.
-
-```sql
-datandard=> SELECT * FROM view_tag_normalization LIMIT 5;
-   id   |      term      
---------+----------------
- 157805 | GDPR
- 257028 | GDPR
- 760297 | Eisenindustrie
- 760298 | Elektrochemie
- 760299 | Kathode
-(5 rows)
-```
-
-In this case, the one `GDPR` tag used to be `gdpr`. 
+Is done in the view `view_tag_normalization`. See [Tag Normalization Documentation](tags.md) for more information.
 
 ## Fixing garbage in published / released timestamps
 From time to time, the published timestamp is not set in the source, or it will be parsed into something garbage. We keep a sourced timestamp from when it was first discovered in a **feed**. As the articles are removed from feeds in a fairly short manner, it is a good estimate that the original published time stamp can be too far from the discovered. Also, if we have multiple time stamps for the same article (but discovered multiple times), we take the first timestamp. The cases are:
@@ -85,20 +71,4 @@ CREATE OR REPLACE VIEW view_articles AS
      GROUP BY 
       a.id, a.link, a.medias, f.language
 ;
-
-Using this as a base will not perform due to the amount of joins. Therefore we can materialize it into a temp table through:
-
-```sql
-CREATE TABLE temp_articles (
-  id bigint,
-  link varchar(5000),
-  medias jsonb,
-  published timestamp with time zone,
-  language varchar(2000),
-  tags varchar(2000)[],
-  authors varchar(500)[],
-  content article_content[]
-);
 ```
-
-and insert by `INSERT INTO temp_articles SELECT * FROM view_articles`. This will make our system run out of space. Need to fix that. 
