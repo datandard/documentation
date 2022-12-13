@@ -34,7 +34,7 @@ FROM news_article
 ## Selecting the articles
 To make this look simpler, we create a view that is the cleaned up version of each article for each feed:
 
-```
+```sql
 CREATE TYPE article_content AS (
  context text,
  contenttype varchar(500),
