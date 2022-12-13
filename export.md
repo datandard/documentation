@@ -72,3 +72,10 @@ CREATE OR REPLACE VIEW view_articles AS
       a.id, a.link, a.medias, f.language
 ;
 ```
+
+## Running a query with filters
+In most cases you want to limit the time stamp of the articles, and you want to select only those from a given tag set. Assuming the tag set to be `(1,2,3)` and a date range, you can select with the following query. 
+
+```sql
+
+```
