@@ -10,16 +10,7 @@ We store data in a very raw format, so a lot of processing is needed to export n
 This is done in a several of view, ending in a single view. Because This view is expensive to build, we will materialize at some point. All views are prefixed with `view_`.
 
 ### Tag normalizations
-
-```sql
-CREATE OR REPLACE VIEW view_tag_normalization AS 
-  SELECT 
-    t1.id as id, COALESCE(t2.term, t1.term) as term 
-  FROM news_tag t1 
-    LEFT JOIN news_tag t2 ON t1.replaced_by_id = t2.id
-```
-
-This creates a table with duplicate tags but keeping the original ids:
+Is done in the view `view_tag_normalization`. See (tags.md)[Tag Normalization Documentation] for more information.
 
 ```sql
 datandard=> SELECT * FROM view_tag_normalization LIMIT 5;
