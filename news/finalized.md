@@ -33,9 +33,13 @@ You can query by `topic`, or `tag` by filtering through JSON.
  - New article
 
 ## Building the final object
-The query to build the finalized object is stored as a view. This make the query to replace them in the script simple. The view is defined as:
+The query to build the finalized object is stored as a view. This make the query to replace them in the script simple:
 
+```sql
+INSERT INTO news_finalized_articles SELECT * FROM view_articles LIMIT 1
 ```
+
+See [Finalized article view](news/finalized_view.md) documentation for how this works:
 
 
 ## Notes
