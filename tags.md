@@ -10,6 +10,7 @@ This defines a view that only contains normalized tags. This takes several thing
 CREATE OR REPLACE VIEW view_tag_normalization AS 
   SELECT 
     t1.id as id, 
+    t1.uuid as uuid,
     COALESCE(t2.term, t1.term) as term, 
     COALESCE(t2.language, t1.language) as language 
   FROM news_tag t1 
