@@ -27,6 +27,7 @@ To make this look simpler, we create a view that is the cleaned up version of ea
 CREATE OR REPLACE VIEW view_articles AS
      SELECT 
       a.id,
+      a.uuid,
       a.link,
       a.medias,
       CASE
@@ -34,24 +35,41 @@ CREATE OR REPLACE VIEW view_articles AS
        WHEN CAST(EXTRACT(EPOCH FROM (a.created_at - to_timestamp(a.published))) AS bigint) < 864000 THEN to_timestamp(a.published)
        ELSE a.created_at
       END AS published,
-     f.language,
-     ARRAY_AGG(distinct t.term) as tags,
-     ARRAY_AGG(distinct w.name) as authors,
-     ARRAY_AGG(distinct (
-       c.context,
-       c.contenttype,
-       c.language,
-       c.base,
-       c.value
-     )::article_content) as content
+     f.id as feed_id,
+     f.uuid as feed_uuid,
+     f.language as feed_language,
+     p.id as publisher_id,
+     p.uuid as publisher_uuid,
+     a.language as article_language,
+     json_agg(distinct jsonb_build_object(
+       'id', t.id,
+       'term', t.term
+     )) FILTER (WHERE t.id IS NOT NULL) as tags,
+     json_agg(distinct jsonb_build_object(
+      'name', w.name
+     )) FILTER (WHERE w.name IS NOT NULL) as authors,
+     json_agg(distinct jsonb_build_object(
+       'context', c.context,
+       'contenttype', c.contenttype,
+       'language', c.language,
+       'base', c.base,
+       'value', c.value
+     )) FILTER (WHERE c.value IS NOT NULL) as content,
+     json_agg(distinct jsonb_build_object(
+      'id', topic.uuid,
+      'name', topic.name
+     )) FILTER (WHERE topic.uuid IS NOT NULL) as topics
      FROM news_article a
       INNER JOIN news_feed f ON (a.feed_id = f.id)
+      INNER JOIN news_publisher p ON (p.id = f.publisher_id)
       LEFT JOIN news_article_tags at ON (at.article_id = a.id)
       LEFT JOIN view_tag_normalization t ON (t.id = at.tag_id)
       LEFT JOIN news_author w ON (w.article_id = a.id)
       LEFT JOIN news_articlecontent c ON (c.article_id = a.id)
+      LEFT JOIN news_topic_tags ON (t.id = news_topic_tags.tag_id)
+      LEFT JOIN news_topic topic ON (topic.id = news_topic_tags.topic_id)
+      
      GROUP BY 
-      a.id, a.link, a.medias, f.language
+      a.id, a.link, a.medias, f.language, f.id, p.id, f.uuid, p.uuid
 ;
 ```
-
