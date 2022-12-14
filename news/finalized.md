@@ -26,6 +26,12 @@ CREATE TABLE news_finalized_articles (
 This structure makes it possible to filter based on `language`, `publisher`, `feed` and `published` without any advanced querying. 
 You can query by `topic`, or `tag` by filtering through JSON.
 
+For updating purpose we create an index on link:
+
+```sql
+create index news_finalized_articles_link ON news_finalized_articles(link);
+```
+
 ## Triggered updates
 When a new article is inserted into the system the id is added to the `NEWS_ARTICLE_FINALIZER` queue, where it is picked up by a worker thread that will insert into the finalized form (see below section). An article will also be inserted or updated when a topic is changed. When a tag is added this is always happening before a new article is inserted so there is no need to update it. 
 
