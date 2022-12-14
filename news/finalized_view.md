@@ -42,7 +42,7 @@ CREATE OR REPLACE VIEW view_articles AS
      p.uuid as publisher_uuid,
      a.language as language,
      json_agg(distinct jsonb_build_object(
-       'id', t.id,
+       'id', t.uuid,
        'term', t.term
      )) FILTER (WHERE t.id IS NOT NULL) as tags,
      json_agg(distinct jsonb_build_object(
