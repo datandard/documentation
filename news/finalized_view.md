@@ -40,7 +40,7 @@ CREATE OR REPLACE VIEW view_articles AS
      f.language as feed_language,
      p.id as publisher_id,
      p.uuid as publisher_uuid,
-     a.language as article_language,
+     a.language as language,
      json_agg(distinct jsonb_build_object(
        'id', t.id,
        'term', t.term
