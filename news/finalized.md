@@ -62,6 +62,17 @@ datandard=> select id, topics from news_finalized_articles where id in (7785318,
 
 ```
 
+If we want to show only a specific topic this can be done with the following query:
+
+```sql
+datandard=> select id, topics from news_finalized_articles where id in (7785318, 7783263, 7783556, 7783795) AND topics @> '[{"name": "Finance"}]';
+   id    |                                                                 topics
+---------+-----------------------------------------------------------------------------------------------------------------------------------------
+ 7783263 | [{"id": "ddded8f7-1a72-4e43-b040-86a01e82d2c6", "name": "Finance"}]
+ 7785318 | [{"id": "7bad8662-a07b-45c5-bea5-1aa6050c0dfb", "name": "Politics"}, {"id": "ddded8f7-1a72-4e43-b040-86a01e82d2c6", "name": "Finance"}]
+(2 rows)
+```
+
 
 ## Notes
 We might have the same article many times with different article ids but same url. That is because a publisher might have the same article in multiple feeds.
