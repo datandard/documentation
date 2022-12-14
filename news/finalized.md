@@ -15,7 +15,7 @@ CREATE TABLE news_finalized_articles (
   feed_language varchar(3000),
   publisher_id bigint,
   publisher_uuid uuid,
-  langauge char(2),
+  language char(2),
   tags JSONB,
   authors JSONB,
   content JSONB,
