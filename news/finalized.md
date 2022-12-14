@@ -6,16 +6,20 @@ Most complex data structures are saved as `JSONB` columns. This makes it a bit l
 ```sql
 CREATE TABLE news_finalized_articles (
   id integer PRIMARY KEY,
+  uuid uuid,
   link varchar(3000),
   media JSONB,
   published timestamp without time zone,
+  feed_id bigint,
+  feed_uuid uuid,
+  feed_language varchar(3000),
+  publisher_id bigint,
+  publisher_uuid uuid,
   langauge char(2),
   tags JSONB,
   authors JSONB,
   content JSONB,
-  topics JSONB,
-  feed_id integer,
-  publisher_id integer
+  topics JSONB
 );
 ```
 
@@ -27,6 +31,12 @@ You can query by `topic`, or `tag` by filtering through JSON.
  - Topic change
  - Tag change
  - New article
+
+## Building the final object
+The query to build the finalized object is stored as a view. This make the query to replace them in the script simple. The view is defined as:
+
+```
+
 
 ## Notes
 We might have the same article many times with different article ids but same url. That is because a publisher might have the same article in multiple feeds.
