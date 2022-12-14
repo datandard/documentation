@@ -45,6 +45,23 @@ INSERT INTO news_finalized_articles SELECT * FROM view_articles LIMIT 1
 
 See [Finalized article view](news/finalized_view.md) documentation for how this works:
 
+## How to query the table
+
+### Filtering by topics
+As an example, see the following subset:
+
+```sql
+datandard=> select id, topics from news_finalized_articles where id in (7785318, 7783263, 7783556, 7783795);
+   id    |                                                                 topics
+---------+-----------------------------------------------------------------------------------------------------------------------------------------
+ 7783263 | [{"id": "ddded8f7-1a72-4e43-b040-86a01e82d2c6", "name": "Finance"}]
+ 7783556 | [{"id": "7bad8662-a07b-45c5-bea5-1aa6050c0dfb", "name": "Politics"}]
+ 7783795 |
+ 7785318 | [{"id": "7bad8662-a07b-45c5-bea5-1aa6050c0dfb", "name": "Politics"}, {"id": "ddded8f7-1a72-4e43-b040-86a01e82d2c6", "name": "Finance"}]
+(4 rows)
+
+```
+
 
 ## Notes
 We might have the same article many times with different article ids but same url. That is because a publisher might have the same article in multiple feeds.
