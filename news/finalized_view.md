@@ -41,8 +41,6 @@ CREATE OR REPLACE VIEW view_articles AS
      p.id as publisher_id,
      p.uuid as publisher_uuid,
      a.language as language,
-     a.domain as domain,
-     a.domain_tld as domain_tld,
      json_agg(distinct jsonb_build_object(
        'id', t.uuid,
        'term', t.term
@@ -60,7 +58,9 @@ CREATE OR REPLACE VIEW view_articles AS
      json_agg(distinct jsonb_build_object(
       'id', topic.uuid,
       'name', topic.name
-     )) FILTER (WHERE topic.uuid IS NOT NULL) as topics
+     )) FILTER (WHERE topic.uuid IS NOT NULL) as topics,
+     a.domain as domain,
+     a.domain_tld as domain_tld
      FROM news_article a
       INNER JOIN news_feed f ON (a.feed_id = f.id)
       INNER JOIN news_publisher p ON (p.id = f.publisher_id)
