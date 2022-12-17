@@ -41,6 +41,8 @@ CREATE OR REPLACE VIEW view_articles AS
      p.id as publisher_id,
      p.uuid as publisher_uuid,
      a.language as language,
+     a.domain as domain,
+     a.domain_tld as domain_tld,
      json_agg(distinct jsonb_build_object(
        'id', t.uuid,
        'term', t.term
