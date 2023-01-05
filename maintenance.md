@@ -15,3 +15,6 @@ UPDATE 9407
 ```
 
 This will disable feeds that has only had a single article and have been in the system for at least 2 days. 
+
+## ... of articles
+There is a special field in the `news_article` table called `attribution_status` that should be `NULL` at any time where you are not doing any attribution or maintenance. This can be set before running a script that changes core elements. For example, adding new scraped values for news articles, we first implemented at deployed the new attribution. Just after, we updated all articles to have the field with status 'planned'. Then our manual attribution script would simply go through that. 
